@@ -1,0 +1,49 @@
+type Author {
+  _id: String
+  name: String
+  twitterHandle: String
+}
+
+type BlogMutations {
+  createPost(_id: String!, title: String!, content: String!, summary: String, category: Category, author: String!): Post
+  createAuthor(_id: String!, name: String!, twitterHandle: String): Author
+}
+
+type BlogSchema {
+  posts(category: Category): [Post]
+  latestPost: Post
+  recentPosts(count: Int!): [Post]
+  post(_id: String!): Post
+  authors: [Author]
+  author(_id: String!): Author
+}
+
+enum Category {
+  METEOR
+  PRODUCT
+  USER_STORY
+  OTHER
+}
+
+type Comment implements HasAuthor {
+  _id: String
+  content: String
+  author: Author
+  timestamp: Float
+  replies: [Comment]
+}
+
+interface HasAuthor {
+  author: Author
+}
+
+type Post implements HasAuthor {
+  _id: String
+  title: String
+  category: Category
+  summary: String
+  content: String
+  timestamp: Float
+  comments(limit: Int): [Comment]
+  author: Author
+}
