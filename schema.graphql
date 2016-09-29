@@ -5,7 +5,7 @@ type Author {
 }
 
 type BlogMutations {
-  createPost(_id: String!, title: String!, content: String!, summary: String, category: Category, author: String!): Post
+  createPost(input: CreatePostInput): CreatePostPayload
   createAuthor(_id: String!, name: String!, twitterHandle: String): Author
 }
 
@@ -31,6 +31,24 @@ type Comment implements HasAuthor {
   author: Author
   timestamp: Float
   replies: [Comment]
+}
+
+input CreatePostInput {
+  _id: String!
+  title: String!
+  content: String!
+  summary: String
+  category: Category
+  author: String!
+}
+
+type CreatePostPayload {
+  _id: String!
+  title: String!
+  content: String!
+  summary: String
+  category: Category
+  author: String!
 }
 
 interface HasAuthor {

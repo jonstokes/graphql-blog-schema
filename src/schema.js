@@ -13,7 +13,8 @@ import {
   GraphQLFloat,
   GraphQLEnumType,
   GraphQLNonNull,
-  GraphQLInterfaceType
+  GraphQLInterfaceType,
+  GraphQLInputObjectType
 } from 'graphql';
 
 const Category = new GraphQLEnumType({
@@ -204,22 +205,39 @@ const Query = new GraphQLObjectType({
   })
 });
 
+const CreatePostPayload = new GraphQLObjectType({
+  name: "CreatePostPayload",
+  fields: {
+    _id: {type: new GraphQLNonNull(GraphQLString)},
+    title: {type: new GraphQLNonNull(GraphQLString)},
+    content: {type: new GraphQLNonNull(GraphQLString)},
+    summary: {type: GraphQLString},
+    category: {type: Category},
+    author: {type: new GraphQLNonNull(GraphQLString), description: "Id of the author"}
+  }
+});
+
+const CreatePostInput = new GraphQLInputObjectType({
+  name: "CreatePostInput",
+  fields: {
+    _id: {type: new GraphQLNonNull(GraphQLString)},
+    title: {type: new GraphQLNonNull(GraphQLString)},
+    content: {type: new GraphQLNonNull(GraphQLString)},
+    summary: {type: GraphQLString},
+    category: {type: Category},
+    author: {type: new GraphQLNonNull(GraphQLString), description: "Id of the author"}
+  }
+});
+
 const Mutation = new GraphQLObjectType({
   name: "BlogMutations",
   fields: {
     createPost: {
-      type: Post,
+      type: CreatePostPayload,
       description: "Create a new blog post",
-      args: {
-        _id: {type: new GraphQLNonNull(GraphQLString)},
-        title: {type: new GraphQLNonNull(GraphQLString)},
-        content: {type: new GraphQLNonNull(GraphQLString)},
-        summary: {type: GraphQLString},
-        category: {type: Category},
-        author: {type: new GraphQLNonNull(GraphQLString), description: "Id of the author"}
-      },
-      resolve: function(source, {...args}) {
-        let post = args;
+      args: { input: { type: CreatePostInput } },
+      resolve: function(source, args) {
+        let post = args.input;
         var alreadyExists = _.findIndex(PostsList, p => p._id === post._id) >= 0;
         if(alreadyExists) {
           throw new Error("Post already exists: " + post._id);
